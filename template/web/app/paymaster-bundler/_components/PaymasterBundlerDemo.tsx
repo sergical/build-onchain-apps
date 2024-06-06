@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useAccount } from 'wagmi';
 import { useWriteContracts } from 'wagmi/experimental';
 import { ContractAlertLayout } from 'app/buy-me-coffee/_components/ContractAlert';
-import isLocal from '../../../src/utils/isLocal';
+// import isLocal from '../../../src/utils/isLocal';
 import { usePaymasterBundlerContract } from '../_contracts/usePaymasterBundlerContract';
 import { CallStatus } from './CallStatus';
 
