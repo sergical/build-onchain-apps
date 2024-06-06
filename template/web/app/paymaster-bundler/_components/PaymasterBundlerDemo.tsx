@@ -8,8 +8,8 @@ import { CallStatus } from './CallStatus';
 
 // Use the local API URL to target the Paymaster directly without a proxy
 // if running on localhost, otherwise use the Paymaster Proxy.
-const paymasterURL = process.env.NEXT_PUBLIC_PAYMASTER_URL;
-const isLocalEnv = isLocal();
+// const paymasterURL = process.env.NEXT_PUBLIC_PAYMASTER_URL;
+// const isLocalEnv = isLocal();
 // const defaultUrl = isLocalEnv ? paymasterURL : `${document.location.origin}/api/paymaster-proxy`;
 
 export default function PaymasterBundlerDemo() {
