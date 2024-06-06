@@ -1,9 +1,9 @@
+import { isBase } from '@coinbase/onchainkit';
 import { NextRequest, NextResponse } from 'next/server';
 import { UserOperation } from 'permissionless';
 import { paymasterClient } from '@/utils/paymasterClient';
-import { isBase } from '@coinbase/onchainkit';
 // import { isValidAAEntrypoint } from '@coinbase/onchainkit/wallet';
-// import { isWalletASmartWallet } from '@coinbase/onchainkit/wallet'; 
+// import { isWalletASmartWallet } from '@coinbase/onchainkit/wallet';
 
 type PaymasterRequest = {
   method: string;
