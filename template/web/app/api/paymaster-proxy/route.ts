@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserOperation } from 'permissionless';
 import { paymasterClient } from '@/utils/paymasterClient';
+import { isBase } from '@coinbase/onchainkit';
+// import { isValidAAEntrypoint } from '@coinbase/onchainkit/wallet';
+// import { isWalletASmartWallet } from '@coinbase/onchainkit/wallet'; 
 
 type PaymasterRequest = {
   method: string;
@@ -17,6 +20,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const reqBody: PaymasterRequest = (await req.json()) as PaymasterRequest;
   const { method, params } = reqBody;
   const [userOp] = params;
+
+  const chainId = 8453;
+
+  if (!isBase({ chainId })) {
+    console.log('The chainId is not Base.');
+    return NextResponse.json({ error: 'Invalid chainId' }, { status: 400 });
+  } else {
+    console.log('The chainId is Base.');
+  }
 
   try {
     let result;
