@@ -21,7 +21,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const { method, params } = reqBody;
   const [userOp] = params;
 
-  const chainId = 8453;
+  const chainId = 1111;
 
   if (!isBase({ chainId })) {
     console.log('The chainId is not Base.');

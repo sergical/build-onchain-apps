@@ -34,7 +34,8 @@ export default function PaymasterBundlerDemo() {
       ],
       capabilities: {
         paymasterService: {
-          url: defaultUrl,
+          // url: defaultUrl,
+          url: `${document.location.origin}/api/paymaster-proxy`,
         },
       },
     });
