@@ -8,16 +8,16 @@ import { CallStatus } from './CallStatus';
 
 // Use the local API URL to target the Paymaster directly without a proxy
 // if running on localhost, otherwise use the Paymaster Proxy.
-const paymasterURL = process.env.NEXT_PUBLIC_PAYMASTER_URL;
+// const paymasterURL = process.env.NEXT_PUBLIC_PAYMASTER_URL;
 // const isLocalEnv = isLocal();
 // const defaultUrl = isLocalEnv ? paymasterURL : `${document.location.origin}/api/paymaster-proxy`;
-const deployUrl = process.env.BOAT_DEPLOY_URL ?? process.env.VERCEL_URL;
-console.log("process env deployUrl: ", process.env.BOAT_DEPLOY_URL);
-console.log("process env vercel url: ", process.env.VERCEL_URL);
-console.log("deployUrl: ", deployUrl);
-const defaultUrl = deployUrl ? `https://${deployUrl}/api/paymaster-proxy` : paymasterURL;
+// const deployUrl = process.env.BOAT_DEPLOY_URL ?? process.env.VERCEL_URL;
+// console.log("process env deployUrl: ", process.env.BOAT_DEPLOY_URL);
+// console.log("process env vercel url: ", process.env.VERCEL_URL);
+// console.log("deployUrl: ", deployUrl);
+// // const defaultUrl = deployUrl ? `https://${deployUrl}/api/paymaster-proxy` : paymasterURL;
 
-console.log('defaultUrl: ', defaultUrl);
+// console.log('defaultUrl: ', defaultUrl);
 
 export default function PaymasterBundlerDemo() {
   const { address } = useAccount();
@@ -41,7 +41,8 @@ export default function PaymasterBundlerDemo() {
       ],
       capabilities: {
         paymasterService: {
-          url: defaultUrl,
+          // url: defaultUrl,
+          url: `/api/paymaster-proxy`,
         },
       },
     });
