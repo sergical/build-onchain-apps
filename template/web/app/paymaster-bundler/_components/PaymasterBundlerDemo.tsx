@@ -42,7 +42,7 @@ export default function PaymasterBundlerDemo() {
       capabilities: {
         paymasterService: {
           // url: defaultUrl,
-          url: `/api/paymaster-proxy`,
+          url: `/api/rpc`,
         },
       },
     });
