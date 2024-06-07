@@ -1,34 +1,66 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useAccount } from 'wagmi';
-import { useWriteContracts, useCapabilities } from 'wagmi/experimental';
+import { useWriteContracts } from 'wagmi/experimental';
 import { ContractAlertLayout } from 'app/buy-me-coffee/_components/ContractAlert';
 import { usePaymasterBundlerContract } from '../_contracts/usePaymasterBundlerContract';
 import { CallStatus } from './CallStatus';
+
+const handleMint = (
+  writeContracts: unknown,
+  contract: unknown,
+  address: unknown,
+  capabilities: unknown,
+) => {
+  console.log('handleMint called with address:', address);
+  if (!address) {
+    console.error('No account address found');
+    return;
+  }
+  writeContracts({
+    contracts: [
+      {
+        address: contract.address,
+        abi: contract.abi,
+        functionName: 'safeMint',
+        args: [address],
+      },
+    ],
+    capabilities,
+  });
+};
 
 export default function PaymasterBundlerDemo() {
   const account = useAccount();
   const [callID, setCallID] = useState<string | undefined>(undefined);
   const { writeContracts } = useWriteContracts({
-    mutation: { onSuccess: (id) => setCallID(id) },
+    mutation: { onSuccess: (id: unknown) => setCallID(id as string) },
   });
-  const { data: availableCapabilities } = useCapabilities({ account: account.address });
   const contract = usePaymasterBundlerContract();
+  const [defaultUrl, setDefaultUrl] = useState<string | undefined>(undefined);
 
-  const capabilities = useMemo(() => {
-    if (!availableCapabilities || !account.chainId) return;
-    const capabilitiesForChain = availableCapabilities[account.chainId];
-    if (capabilitiesForChain?.paymasterService?.supported) {
-      return {
-        paymasterService: {
-          url: `${document.location.origin}/api/paymaster-proxy`,
-        },
-      };
+  useEffect(() => {
+    console.log('PaymasterBundlerDemo mounted');
+    if (typeof document !== 'undefined') {
+      const url = `${document.location.origin}/api/paymaster-proxy`;
+      setDefaultUrl(url);
+      console.log('defaultUrl set to:', url);
+    } else {
+      console.error('document is undefined');
     }
-  }, [availableCapabilities, account.chainId]);
+  }, []);
+
+  const capabilities = useMemo(
+    () => ({
+      paymasterService: {
+        url: defaultUrl,
+      },
+    }),
+    [defaultUrl],
+  );
 
   if (contract.status !== 'ready') {
-    console.error('Contract is not ready');
+    console.error('Contract is not ready', contract);
     return null;
   }
 
@@ -63,21 +95,11 @@ export default function PaymasterBundlerDemo() {
               ? 'cursor-pointer bg-blue-600 hover:bg-blue-700'
               : 'cursor-not-allowed bg-gray-600',
           )}
-          onClick={() => {
-            if (account.address) {
-              writeContracts({
-                contracts: [
-                  {
-                    address: contract.address,
-                    abi: contract.abi,
-                    functionName: 'safeMint',
-                    args: [account.address],
-                  },
-                ],
-                capabilities,
-              });
-            }
-          }}
+          onClick={
+            account.address
+              ? () => handleMint(writeContracts, contract, account.address, capabilities)
+              : undefined
+          }
           disabled={!account.address}
         >
           Mint NFT
