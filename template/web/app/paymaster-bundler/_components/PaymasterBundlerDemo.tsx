@@ -1,52 +1,36 @@
-import clsx from 'clsx';
 import { useAccount } from 'wagmi';
-import { useWriteContracts } from 'wagmi/experimental';
+import { useWriteContracts, useCapabilities } from 'wagmi/experimental';
+import { useMemo, useState } from 'react';
+import clsx from 'clsx';
 import { ContractAlertLayout } from 'app/buy-me-coffee/_components/ContractAlert';
-// import isLocal from '../../../src/utils/isLocal';
 import { usePaymasterBundlerContract } from '../_contracts/usePaymasterBundlerContract';
 import { CallStatus } from './CallStatus';
 
-// Use the local API URL to target the Paymaster directly without a proxy
-// if running on localhost, otherwise use the Paymaster Proxy.
-// const paymasterURL = process.env.NEXT_PUBLIC_PAYMASTER_URL;
-// const isLocalEnv = isLocal();
-// const defaultUrl = isLocalEnv ? paymasterURL : `${document.location.origin}/api/paymaster-proxy`;
-// const deployUrl = process.env.BOAT_DEPLOY_URL ?? process.env.VERCEL_URL;
-// console.log("process env deployUrl: ", process.env.BOAT_DEPLOY_URL);
-// console.log("process env vercel url: ", process.env.VERCEL_URL);
-// console.log("deployUrl: ", deployUrl);
-// // const defaultUrl = deployUrl ? `https://${deployUrl}/api/paymaster-proxy` : paymasterURL;
-
-// console.log('defaultUrl: ', defaultUrl);
-
 export default function PaymasterBundlerDemo() {
-  const { address } = useAccount();
-  const { data: callID, writeContracts } = useWriteContracts();
+  const account = useAccount();
+  const [callID, setCallID] = useState<string | undefined>(undefined);
+  const { writeContracts } = useWriteContracts({
+    mutation: { onSuccess: (id) => setCallID(id) },
+  });
+  const { data: availableCapabilities } = useCapabilities({ account: account.address });
   const contract = usePaymasterBundlerContract();
+
+  const capabilities = useMemo(() => {
+    if (!availableCapabilities || !account.chainId) return;
+    const capabilitiesForChain = availableCapabilities[account.chainId];
+    if (capabilitiesForChain?.paymasterService?.supported) {
+      return {
+        paymasterService: {
+          url: `${document.location.origin}/api/paymaster-proxy`,
+        },
+      };
+    }
+  }, [availableCapabilities, account.chainId]);
 
   if (contract.status !== 'ready') {
     console.error('Contract is not ready');
     return null;
   }
-
-  const handleMint = () => {
-    writeContracts({
-      contracts: [
-        {
-          address: contract.address,
-          abi: contract.abi,
-          functionName: 'safeMint',
-          args: [address],
-        },
-      ],
-      capabilities: {
-        paymasterService: {
-          // url: defaultUrl,
-          url: `/api/rpc`,
-        },
-      },
-    });
-  };
 
   return (
     <div className={clsx('flex w-full flex-col items-center justify-center text-white')}>
@@ -56,9 +40,9 @@ export default function PaymasterBundlerDemo() {
             Account Details
           </h2>
         </header>
-        {address && (
+        {account.address && (
           <div className={clsx('mt-2 text-lg')}>
-            <strong>Smart Wallet Address:</strong> {address}
+            <strong>Smart Wallet Address:</strong> {account.address}
           </div>
         )}
       </section>
@@ -68,19 +52,33 @@ export default function PaymasterBundlerDemo() {
             Mint NFTs with Coinbase Paymaster
           </h1>
         </header>
-        {!address && (
+        {!account.address && (
           <ContractAlertLayout>Please connect your wallet to continue.</ContractAlertLayout>
         )}
         <button
           type="button"
           className={clsx(
             'mt-4 block w-full rounded-full py-3.5 text-lg font-bold text-white transition duration-300',
-            address
+            account.address
               ? 'cursor-pointer bg-blue-600 hover:bg-blue-700'
               : 'cursor-not-allowed bg-gray-600',
           )}
-          onClick={address ? handleMint : undefined}
-          disabled={!address}
+          onClick={() => {
+            if (account.address) {
+              writeContracts({
+                contracts: [
+                  {
+                    address: contract.address,
+                    abi: contract.abi,
+                    functionName: 'safeMint',
+                    args: [account.address],
+                  },
+                ],
+                capabilities,
+              });
+            }
+          }}
+          disabled={!account.address}
         >
           Mint NFT
         </button>
