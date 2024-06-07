@@ -7,10 +7,10 @@ import { usePaymasterBundlerContract } from '../_contracts/usePaymasterBundlerCo
 import { CallStatus } from './CallStatus';
 
 const handleMint = (
-  writeContracts: (args: unknown) => void,
-  contract: unknown,
-  address: unknown,
-  capabilities: unknown,
+  writeContracts: (args: any) => void,
+  contract: any,
+  address: any,
+  capabilities: any,
 ) => {
   console.log('handleMint called with address:', address);
   if (!address) {
@@ -35,7 +35,7 @@ export default function PaymasterBundlerDemo() {
   const [callID, setCallID] = useState<string | undefined>(undefined);
   // const { data: availableCapabilities } = useCapabilities({ account: account });
   const { writeContracts } = useWriteContracts({
-    mutation: { onSuccess: (id: unknown) => setCallID(id as string) },
+    mutation: { onSuccess: (id: any) => setCallID(id as string) },
   });
   const contract = usePaymasterBundlerContract();
   const [defaultUrl, setDefaultUrl] = useState<string | undefined>(undefined);
