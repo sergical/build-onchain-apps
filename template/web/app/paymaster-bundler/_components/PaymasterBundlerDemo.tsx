@@ -7,7 +7,7 @@ import { usePaymasterBundlerContract } from '../_contracts/usePaymasterBundlerCo
 import { CallStatus } from './CallStatus';
 
 const handleMint = (
-  writeContracts: unknown,
+  writeContracts: (args: unknown) => void,
   contract: unknown,
   address: unknown,
   capabilities: unknown,
@@ -33,6 +33,7 @@ const handleMint = (
 export default function PaymasterBundlerDemo() {
   const account = useAccount();
   const [callID, setCallID] = useState<string | undefined>(undefined);
+  // const { data: availableCapabilities } = useCapabilities({ account: account });
   const { writeContracts } = useWriteContracts({
     mutation: { onSuccess: (id: unknown) => setCallID(id as string) },
   });
